@@ -3,10 +3,12 @@ const MAX_BLUR = 5; // same blur as the "Before starting" design
 
 const timeEl = document.getElementById("time");
 const artEl = document.getElementById("art");
+const infoEl = document.getElementById("info");
 const mainButton = document.getElementById("main-button");
 const resetButton = document.getElementById("reset-button");
+const restartButton = document.getElementById("restart-button");
 
-let state = "idle"; // "idle", "running" or "paused"
+let state = "idle"; // "idle", "running", "paused" or "finished"
 let remainingMs = TOTAL_MS;
 let endTime = 0; // the clock time when the timer will reach zero
 let intervalId = null;
@@ -17,6 +19,13 @@ function show() {
   const ss = String(seconds % 60).padStart(2, "0");
   timeEl.textContent = mm + ":" + ss;
   artEl.style.setProperty("--blur", (MAX_BLUR * remainingMs) / TOTAL_MS);
+  document.body.dataset.state = state;
+
+  const finished = state === "finished";
+  mainButton.hidden = finished;
+  resetButton.hidden = finished;
+  restartButton.hidden = !finished;
+  infoEl.hidden = !finished;
   mainButton.textContent =
     state === "running" ? "Pause" : state === "paused" ? "Resume" : "Start";
 }
@@ -28,6 +37,7 @@ function update() {
   if (remainingMs === 0) {
     clearInterval(intervalId);
     intervalId = null;
+    state = "finished";
   }
   show();
 }
@@ -41,6 +51,7 @@ function start() {
 
 function pause() {
   update();
+  if (state !== "running") return; // it just finished
   clearInterval(intervalId);
   intervalId = null;
   state = "paused";
@@ -56,14 +67,16 @@ function reset() {
 }
 
 mainButton.addEventListener("click", () => {
-  if (state === "running") {
-    if (remainingMs > 0) pause();
-  } else if (remainingMs > 0) {
-    start();
-  }
+  if (state === "running") pause();
+  else start();
 });
 
 resetButton.addEventListener("click", reset);
+
+restartButton.addEventListener("click", () => {
+  reset();
+  mainButton.focus();
+});
 
 document.addEventListener("visibilitychange", () => {
   if (state === "running") update();

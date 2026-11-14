@@ -6,13 +6,21 @@
   <title>Pomodoro Timer</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-state="idle">
   <div class="art" id="art" aria-hidden="true"></div>
   <main class="panel">
-    <p class="time" id="time" role="timer">25:00</p>
-    <div class="buttons">
-      <button type="button" class="btn primary" id="main-button">Start</button>
-      <button type="button" class="btn" id="reset-button">Reset</button>
+    <div class="head">
+      <p class="time" id="time" role="timer">25:00</p>
+      <div class="buttons">
+        <button type="button" class="btn primary" id="main-button">Start</button>
+        <button type="button" class="btn" id="reset-button">Reset</button>
+        <button type="button" class="btn primary" id="restart-button" hidden>Restart session</button>
+      </div>
+    </div>
+    <div class="info" id="info" hidden>
+      <p class="title">Painting name</p>
+      <p class="meta">Artist name · Year</p>
+      <a class="link" href="https://example.com" target="_blank" rel="noopener noreferrer">Read about this painting →</a>
     </div>
   </main>
   <script src="script.js"></script>
