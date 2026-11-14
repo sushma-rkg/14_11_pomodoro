@@ -60,6 +60,20 @@ body {
   pointer-events: none;
 }
 
+/* Quiet messages ("Loading painting…" and the friendly message) */
+.note {
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  transform: translateX(-50%);
+  width: min(80%, 34em);
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+  color: #c9d3d6;
+  font-size: max(15px, calc(var(--u) * 2.2));
+}
+
 /* Frosted-glass panel in the middle */
 .panel {
   position: absolute;
@@ -115,6 +129,10 @@ body {
 @media (max-aspect-ratio: 1/1) {
   :root {
     --u: 1vw;
+  }
+  .note {
+    width: 84%;
+    font-size: max(16px, calc(var(--u) * 4.4));
   }
   .panel {
     border-radius: calc(var(--u) * 7);

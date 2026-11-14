@@ -3,6 +3,7 @@ const TOTAL_MS = 30 * 1000; // TEMPORARY for testing: set back to 25 * 60 * 1000
 const timeEl = document.getElementById("time");
 const paintingEl = document.getElementById("painting");
 const frameEl = document.getElementById("frame");
+const noteEl = document.getElementById("note");
 const blurEl = document.getElementById("blur-layer");
 const titleEl = document.getElementById("painting-title");
 const metaEl = document.getElementById("painting-meta");
@@ -97,33 +98,89 @@ let maxBlur = 0; // the strongest blur (in pixels) for the painting on screen
 let blurJump = false; // true = change the blur at once instead of gliding
 let loadCount = 0;
 
+const REQUEST_TIMEOUT_MS = 10000; // how long we wait for the Met
+const MAX_PAINTINGS = 5; // how many different paintings we try
+const FRIENDLY_MESSAGE =
+  "We couldn't load a painting right now. You can still use the timer. Refresh the page to try again.";
+
+// Asks the Met for something. Gives up (throws) if the Met takes longer than
+// 10 seconds or answers with an error. Returns null if the Met has no such record.
 async function getJson(url) {
-  const response = await fetch(url);
-  return response.json();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error("The Met answered with an error");
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
-// Picks a random painting. If it is not public domain or has no image,
-// quietly picks another.
-async function pickPainting() {
+// Shows the image in the page. Gives true if it loaded, false if it is broken.
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error("The image took too long")),
+      REQUEST_TIMEOUT_MS
+    );
+    paintingEl.onload = () => {
+      clearTimeout(timer);
+      resolve(true);
+    };
+    paintingEl.onerror = () => {
+      clearTimeout(timer);
+      resolve(false);
+    };
+    paintingEl.src = url;
+  });
+}
+
+function isUsable(object) {
+  if (!object || object.isPublicDomain !== true) return false;
+  const kind = (object.classification || "") + " " + (object.objectName || "");
+  return /painting/i.test(kind) && Boolean(object.primaryImageSmall || object.primaryImage);
+}
+
+// Picks a random painting. A record that is not a public domain painting, has
+// no image, or whose image will not load is quietly skipped (up to 5 paintings).
+// Throws if the Met does not answer. Gives null if all 5 paintings were no good.
+async function pickPainting(thisLoad) {
   const first = await getJson(SEARCH + "&limit=1");
+  if (!first || !first.total) throw new Error("No search answer");
   const reachable = Math.min(first.total, 10000);
-  for (let attempt = 0; attempt < 25; attempt++) {
+  const tried = new Set();
+  let paintings = 0;
+  for (let round = 0; round < 25 && paintings < MAX_PAINTINGS; round++) {
     const offset = Math.floor(Math.random() * reachable);
     const page = await getJson(SEARCH + "&offset=" + offset + "&limit=1");
-    if (!page.objectIDs || page.objectIDs.length === 0) continue;
-    const object = await getJson(OBJECT + page.objectIDs[0]);
+    if (!page) throw new Error("No search answer");
+    const id = page.objectIDs && page.objectIDs[0];
+    if (!id || tried.has(id)) continue;
+    tried.add(id);
+    paintings++;
+    const object = await getJson(OBJECT + id);
+    if (thisLoad !== loadCount) return null;
+    if (!isUsable(object)) continue;
     const image = object.primaryImageSmall || object.primaryImage;
-    if (object.isPublicDomain && image) {
+    if (await loadImage(image)) {
       return {
-        image,
         title: object.title,
         artist: object.artistDisplayName || "Unknown",
         year: object.objectDate || "Unknown",
         link: object.objectURL,
       };
     }
+    if (thisLoad !== loadCount) return null;
+    paintingEl.removeAttribute("src");
   }
   return null;
+}
+
+function setNote(text) {
+  noteEl.textContent = text || "";
+  noteEl.hidden = !text;
 }
 
 // The blurred copy of the painting. The picture is mirrored around its own
@@ -178,20 +235,29 @@ async function loadPainting() {
   frameEl.classList.remove("ready");
   paintingEl.removeAttribute("src");
   blurJump = true;
+  setNote("Loading painting…");
   show();
-  const chosen = await pickPainting();
-  if (thisLoad !== loadCount || !chosen) return; // a newer painting was asked for
+  let chosen = null;
+  try {
+    chosen = await pickPainting(thisLoad);
+  } catch (error) {
+    chosen = null; // the Met did not answer
+  }
+  if (thisLoad !== loadCount) return; // a newer painting was asked for
+  if (!chosen) {
+    paintingEl.removeAttribute("src");
+    setNote(FRIENDLY_MESSAGE);
+    show();
+    return;
+  }
   painting = chosen;
-  paintingEl.onload = () => {
-    if (thisLoad !== loadCount) return;
-    frameEl.style.setProperty(
-      "--ratio",
-      paintingEl.naturalWidth / paintingEl.naturalHeight
-    );
-    drawBlurLayer(); // blurred first, then shown: it never appears sharp
-    frameEl.classList.add("ready");
-  };
-  paintingEl.src = chosen.image;
+  setNote(null);
+  frameEl.style.setProperty(
+    "--ratio",
+    paintingEl.naturalWidth / paintingEl.naturalHeight
+  );
+  drawBlurLayer(); // blurred first, then shown: it never appears sharp
+  frameEl.classList.add("ready");
   show();
 }
 
@@ -219,7 +285,7 @@ function show() {
   mainButton.hidden = finished;
   resetButton.hidden = finished;
   restartButton.hidden = !finished;
-  infoEl.hidden = !finished;
+  infoEl.hidden = !(finished && painting);
   showDetails(finished);
   mainButton.textContent =
     state === "running" ? "Pause" : state === "paused" ? "Resume" : "Start";
