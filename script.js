@@ -1,8 +1,10 @@
 const TOTAL_MS = 30 * 1000; // TEMPORARY for testing: set back to 25 * 60 * 1000
-const MAX_BLUR = 5; // same blur as the "Before starting" design
 
 const timeEl = document.getElementById("time");
-const artEl = document.getElementById("art");
+const paintingEl = document.getElementById("painting");
+const titleEl = document.getElementById("painting-title");
+const metaEl = document.getElementById("painting-meta");
+const linkEl = document.getElementById("painting-link");
 const infoEl = document.getElementById("info");
 const mainButton = document.getElementById("main-button");
 const resetButton = document.getElementById("reset-button");
@@ -84,12 +86,76 @@ function ringIfMissed() {
   bell = planBell(audioCtx.currentTime + 0.05);
 }
 
+// ---- The painting (from the Met Museum's free public API) ----
+const MET = "https://collectionapi.metmuseum.org/public/collection";
+const SEARCH = MET + "/v1.1/search?q=*&hasImages=true&medium=Paintings";
+const OBJECT = MET + "/v1/objects/";
+let painting = null; // everything we show comes from this one record
+let loadCount = 0;
+
+async function getJson(url) {
+  const response = await fetch(url);
+  return response.json();
+}
+
+// Picks a random painting. If it is not public domain or has no image,
+// quietly picks another.
+async function pickPainting() {
+  const first = await getJson(SEARCH + "&limit=1");
+  const reachable = Math.min(first.total, 10000);
+  for (let attempt = 0; attempt < 25; attempt++) {
+    const offset = Math.floor(Math.random() * reachable);
+    const page = await getJson(SEARCH + "&offset=" + offset + "&limit=1");
+    if (!page.objectIDs || page.objectIDs.length === 0) continue;
+    const object = await getJson(OBJECT + page.objectIDs[0]);
+    const image = object.primaryImageSmall || object.primaryImage;
+    if (object.isPublicDomain && image) {
+      return {
+        image,
+        title: object.title,
+        artist: object.artistDisplayName || "Unknown",
+        year: object.objectDate || "Unknown",
+        link: object.objectURL,
+      };
+    }
+  }
+  return null;
+}
+
+async function loadPainting() {
+  const thisLoad = ++loadCount;
+  painting = null;
+  paintingEl.classList.remove("ready");
+  paintingEl.removeAttribute("src");
+  show();
+  const chosen = await pickPainting();
+  if (thisLoad !== loadCount || !chosen) return; // a newer painting was asked for
+  painting = chosen;
+  paintingEl.onload = () => {
+    if (thisLoad === loadCount) paintingEl.classList.add("ready");
+  };
+  paintingEl.src = chosen.image;
+  show();
+}
+
+// The details are only put on the page once the timer has finished.
+function showDetails(finished) {
+  if (finished && painting) {
+    titleEl.textContent = painting.title;
+    metaEl.textContent = painting.artist + " · " + painting.year;
+    linkEl.href = painting.link;
+  } else {
+    titleEl.textContent = "";
+    metaEl.textContent = "";
+    linkEl.removeAttribute("href");
+  }
+}
+
 function show() {
   const seconds = Math.ceil(remainingMs / 1000);
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   timeEl.textContent = mm + ":" + ss;
-  artEl.style.setProperty("--blur", (MAX_BLUR * remainingMs) / TOTAL_MS);
   document.body.dataset.state = state;
 
   const finished = state === "finished";
@@ -97,6 +163,7 @@ function show() {
   resetButton.hidden = finished;
   restartButton.hidden = !finished;
   infoEl.hidden = !finished;
+  showDetails(finished);
   mainButton.textContent =
     state === "running" ? "Pause" : state === "paused" ? "Resume" : "Start";
 }
@@ -151,6 +218,7 @@ resetButton.addEventListener("click", reset);
 
 restartButton.addEventListener("click", () => {
   reset();
+  loadPainting();
   mainButton.focus();
 });
 
@@ -159,3 +227,4 @@ document.addEventListener("visibilitychange", () => {
 });
 
 show();
+loadPainting();

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body data-state="idle">
-  <div class="art" id="art" aria-hidden="true"></div>
+  <div class="stage"><img id="painting" alt="" draggable="false"></div>
   <main class="panel">
     <div class="head">
       <p class="time" id="time" role="timer">25:00</p>
@@ -18,9 +18,9 @@
       </div>
     </div>
     <div class="info" id="info" hidden>
-      <p class="title">Painting name</p>
-      <p class="meta">Artist name · Year</p>
-      <a class="link" href="https://example.com" target="_blank" rel="noopener noreferrer">Read about this painting →</a>
+      <p class="title" id="painting-title"></p>
+      <p class="meta" id="painting-meta"></p>
+      <a class="link" id="painting-link" target="_blank" rel="noopener noreferrer">Read about this painting →</a>
     </div>
   </main>
   <script src="script.js"></script>
