@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup: Paper Gallery</title><style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f2ee;color:#2b2f33;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-bottom:56px}
+header{padding:36px 16px 4px;text-align:center}
+h1{font-size:1.7rem;font-weight:600;margin:0}
+.sub{margin:8px auto 0;max-width:640px;color:#62676c;line-height:1.5}
+h2{text-align:center;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;color:#62676c;margin:44px 16px 18px}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;padding:0 16px}
+figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+figure.laptop-fig{width:min(100%,560px)}
+figure.phone-fig{width:min(100%,230px)}
+figcaption{font-size:.92rem;color:#4a4f55}
+.device{container-type:size;position:relative;overflow:hidden;background:#222;border:6px solid #1f2328;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.device.laptop{width:100%;aspect-ratio:16/10;border-radius:12px}
+.device.phone{width:100%;aspect-ratio:9/19;border-radius:30px}
+.device button{font-family:inherit;cursor:default}
+.device a{color:inherit}
+.time{font-weight:200;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.btns{display:flex;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;font-weight:500;white-space:nowrap}
+.art{position:absolute;inset:-8%;filter:blur(calc(var(--b)*1cqw))}
+.device{--b:5}
+.s-running{--b:2.4}
+.s-finished{--b:0}
+
+.art{background:radial-gradient(circle at 72% 30%,#e9b08a 0 13%,transparent 14%),radial-gradient(ellipse at 18% 115%,#2f7f86 0 50%,transparent 51%),radial-gradient(ellipse at 90% 118%,#c99a5b 0 46%,transparent 47%),linear-gradient(180deg,#f1dcc0,#f8ecd6)}
+.screen{position:absolute;inset:0;background:#f6f0e4;color:#41362d;display:flex}
+.frame{background:#fff;box-shadow:0 .8cqw 2.4cqw rgba(70,45,20,.2);flex:none}
+.pic{position:relative;overflow:hidden;width:100%;height:100%}
+.strip{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:0}
+.btns{justify-content:center}
+.btn{background:transparent;color:#8c4a33;box-shadow:inset 0 0 0 1.5px #c98a70}
+.btn.primary{background:#b5654a;color:#fff;box-shadow:none}
+.label{text-align:left;border-left:.5cqw solid #b5654a}
+.title{font-weight:600}
+.meta{opacity:.8}
+.link{display:inline-block;font-weight:500;color:#8c4a33;text-decoration:underline}
+.laptop .screen{padding:3cqw;gap:3cqw}
+.laptop .frame{width:58%;height:100%;padding:1.6cqw}
+.laptop .time{font-size:9cqw}
+.laptop .btns{gap:1.2cqw;margin-top:2.4cqw}
+.laptop .btn{font-size:1.9cqw;padding:1cqw 2.8cqw}
+.laptop.s-finished .time{font-size:7.5cqw}
+.laptop .label{margin-top:3cqw;padding-left:1.6cqw}
+.laptop .title{font-size:2.2cqw}
+.laptop .meta{font-size:1.8cqw;margin-top:.5cqw}
+.laptop .link{font-size:1.6cqw;margin-top:1cqw}
+.phone .screen{flex-direction:column;padding:5cqw;gap:5cqw}
+.phone .frame{width:100%;height:62%;padding:2.6cqw}
+.phone.s-finished .frame{height:44%}
+.phone .strip{justify-content:flex-start}
+.phone .time{font-size:20cqw}
+.phone.s-finished .time{font-size:12cqw}
+.phone .btns{gap:3cqw;margin-top:4.5cqw}
+.phone .btn{font-size:5cqw;padding:2.5cqw 6.5cqw}
+.phone .label{margin-top:4cqw;padding-left:3cqw}
+.phone .title{font-size:5cqw}
+.phone .meta{font-size:4.2cqw;margin-top:.8cqw}
+.phone .link{font-size:3.8cqw;margin-top:1.6cqw}
+</style></head><body>
+<header><h1>Paper Gallery</h1><p class="sub">A warm cream page with a framed painting and a calm strip for the timer. Design mockup only: nothing works yet, and the painting is a coloured shape for now.</p></header>
+<h2>On a laptop</h2><div class="row">
+<figure class="laptop-fig"><div class="device laptop s-before"><div class="screen"><div class="frame"><div class="pic"><div class="art"></div></div></div><div class="strip"><div class="time">25:00</div><div class="btns"><button type="button" class="btn primary">Start</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>1 · Before starting</figcaption></figure>
+<figure class="laptop-fig"><div class="device laptop s-running"><div class="screen"><div class="frame"><div class="pic"><div class="art"></div></div></div><div class="strip"><div class="time">14:32</div><div class="btns"><button type="button" class="btn primary">Pause</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>2 · Timer running</figcaption></figure>
+<figure class="laptop-fig"><div class="device laptop s-finished"><div class="screen"><div class="frame"><div class="pic"><div class="art"></div></div></div><div class="strip"><div class="time">00:00</div><div class="btns"><button type="button" class="btn primary">Restart session</button></div><div class="label"><div class="title">Young Woman with a Water Pitcher</div><div class="meta">Johannes Vermeer · ca. 1662</div><a class="link" href="#">Read about this painting →</a></div></div></div></div><figcaption>3 · Timer finished</figcaption></figure>
+</div>
+<h2>On a phone</h2><div class="row">
+<figure class="phone-fig"><div class="device phone s-before"><div class="screen"><div class="frame"><div class="pic"><div class="art"></div></div></div><div class="strip"><div class="time">25:00</div><div class="btns"><button type="button" class="btn primary">Start</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>1 · Before starting</figcaption></figure>
+<figure class="phone-fig"><div class="device phone s-running"><div class="screen"><div class="frame"><div class="pic"><div class="art"></div></div></div><div class="strip"><div class="time">14:32</div><div class="btns"><button type="button" class="btn primary">Pause</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>2 · Timer running</figcaption></figure>
+<figure class="phone-fig"><div class="device phone s-finished"><div class="screen"><div class="frame"><div class="pic"><div class="art"></div></div></div><div class="strip"><div class="time">00:00</div><div class="btns"><button type="button" class="btn primary">Restart session</button></div><div class="label"><div class="title">Young Woman with a Water Pitcher</div><div class="meta">Johannes Vermeer · ca. 1662</div><a class="link" href="#">Read about this painting →</a></div></div></div></div><figcaption>3 · Timer finished</figcaption></figure>
+</div>
+</body></html>

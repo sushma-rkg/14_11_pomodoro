@@ -1,7 +1,248 @@
+/* One "unit" scales with the screen, like the chosen Quiet Window design. */
+:root {
+  --u: min(1vw, 1.6vh);
+}
+
+html {
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+  background: #14181b;
+  color: #25363d;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* The painting area: exactly the size of the painting, fitted inside the screen
+   (never stretched or cut off). Anything blurred stays inside this area. */
+.stage {
+  position: absolute;
+  inset: 0;
+  container-type: size;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.frame {
+  --ratio: 1;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--ratio);
+  width: min(100cqw, calc(100cqh * var(--ratio)));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.frame.ready {
+  opacity: 1;
+}
+
+.frame img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.frame canvas {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Quiet messages ("Loading painting…" and the friendly message) */
+.note {
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  transform: translateX(-50%);
+  width: min(80%, 34em);
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+  color: #c9d3d6;
+  font-size: max(15px, calc(var(--u) * 2.2));
+}
+
+/* Frosted-glass panel in the middle */
+.panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(calc(var(--u) * 2.4)) saturate(1.3);
+  backdrop-filter: blur(calc(var(--u) * 2.4)) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: calc(var(--u) * 3);
+  padding: calc(var(--u) * 3.5) calc(var(--u) * 7);
+}
+
+.time {
+  margin: 0;
+  font-size: calc(var(--u) * 12);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: calc(var(--u) * 1.4);
+  margin-top: calc(var(--u) * 2.6);
+}
+
+.btn {
+  border: 0;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: max(14px, calc(var(--u) * 1.9));
+  padding: calc(var(--u) * 1) calc(var(--u) * 3);
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.8);
+  color: #2f4a52;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #3f6f78;
+  color: #fff;
+  min-width: 6.2em;
+}
+
+/* Phone (tall screens): bigger, rounder panel */
+@media (max-aspect-ratio: 1/1) {
+  :root {
+    --u: 1vw;
+  }
+  .note {
+    width: 84%;
+    font-size: max(16px, calc(var(--u) * 4.4));
+  }
+  .panel {
+    border-radius: calc(var(--u) * 7);
+    padding: calc(var(--u) * 7) calc(var(--u) * 9);
+  }
+  .time {
+    font-size: calc(var(--u) * 24);
+  }
+  .buttons {
+    gap: calc(var(--u) * 3);
+    margin-top: calc(var(--u) * 6);
+  }
+  .btn {
+    font-size: calc(var(--u) * 5);
+    padding: calc(var(--u) * 2.6) calc(var(--u) * 7);
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---- Timer finished: sharp painting, details panel at the bottom ---- */
+.title,
+.meta {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.info {
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.meta {
+  opacity: 0.8;
+}
+
+.link {
+  display: inline-block;
+  font-weight: 500;
+  color: inherit;
+  text-decoration: underline;
+}
+
+body[data-state="finished"] .panel {
+  top: auto;
+  left: calc(var(--u) * 4);
+  right: calc(var(--u) * 4);
+  bottom: calc(var(--u) * 4);
+  transform: none;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: calc(var(--u) * 5);
+  align-items: center;
+  text-align: left;
+  padding: calc(var(--u) * 2.8) calc(var(--u) * 4);
+}
+
+body[data-state="finished"] .time {
+  font-size: calc(var(--u) * 8);
+}
+
+body[data-state="finished"] .buttons {
+  justify-content: flex-start;
+  margin-top: calc(var(--u) * 1.8);
+}
+
+body[data-state="finished"] .title {
+  font-size: calc(var(--u) * 2.5);
+}
+
+body[data-state="finished"] .meta {
+  font-size: calc(var(--u) * 1.9);
+  margin-top: calc(var(--u) * 0.6);
+}
+
+body[data-state="finished"] .link {
+  font-size: calc(var(--u) * 1.8);
+  margin-top: calc(var(--u) * 1.4);
+}
+
+@media (max-aspect-ratio: 1/1) {
+  body[data-state="finished"] .panel {
+    display: block;
+    text-align: center;
+    padding: calc(var(--u) * 6) calc(var(--u) * 5);
+  }
+  body[data-state="finished"] .time {
+    font-size: calc(var(--u) * 15);
+  }
+  body[data-state="finished"] .buttons {
+    justify-content: center;
+    margin-top: calc(var(--u) * 3.5);
+  }
+  body[data-state="finished"] .info {
+    margin-top: calc(var(--u) * 5);
+  }
+  body[data-state="finished"] .title {
+    font-size: calc(var(--u) * 5.4);
+  }
+  body[data-state="finished"] .meta {
+    font-size: calc(var(--u) * 4.4);
+    margin-top: calc(var(--u) * 1);
+  }
+  body[data-state="finished"] .link {
+    font-size: calc(var(--u) * 4);
+    margin-top: calc(var(--u) * 2.4);
+  }
 }

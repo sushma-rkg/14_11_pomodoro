@@ -3,11 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pomodoro Art</title>
+  <title>Pomodoro Timer</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <h1>Pomodoro Art</h1>
+<body data-state="idle">
+  <div class="stage">
+    <div class="frame" id="frame">
+      <img id="painting" alt="" draggable="false">
+      <canvas id="blur-layer" aria-hidden="true"></canvas>
+    </div>
+  </div>
+  <p class="note" id="note" role="status" hidden></p>
+  <main class="panel">
+    <div class="head">
+      <p class="time" id="time" role="timer">25:00</p>
+      <div class="buttons">
+        <button type="button" class="btn primary" id="main-button">Start</button>
+        <button type="button" class="btn" id="reset-button">Reset</button>
+        <button type="button" class="btn primary" id="restart-button" hidden>Restart session</button>
+      </div>
+    </div>
+    <div class="info" id="info" hidden>
+      <p class="title" id="painting-title"></p>
+      <p class="meta" id="painting-meta"></p>
+      <a class="link" id="painting-link" target="_blank" rel="noopener noreferrer">Read about this painting →</a>
+    </div>
+  </main>
   <script src="script.js"></script>
 </body>
 </html>
