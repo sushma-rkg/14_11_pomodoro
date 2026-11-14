@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup: Floating Pill</title><style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f2ee;color:#2b2f33;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-bottom:56px}
+header{padding:36px 16px 4px;text-align:center}
+h1{font-size:1.7rem;font-weight:600;margin:0}
+.sub{margin:8px auto 0;max-width:640px;color:#62676c;line-height:1.5}
+h2{text-align:center;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;color:#62676c;margin:44px 16px 18px}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;padding:0 16px}
+figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+figure.laptop-fig{width:min(100%,560px)}
+figure.phone-fig{width:min(100%,230px)}
+figcaption{font-size:.92rem;color:#4a4f55}
+.device{container-type:size;position:relative;overflow:hidden;background:#222;border:6px solid #1f2328;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.device.laptop{width:100%;aspect-ratio:16/10;border-radius:12px}
+.device.phone{width:100%;aspect-ratio:9/19;border-radius:30px}
+.device button{font-family:inherit;cursor:default}
+.device a{color:inherit}
+.time{font-weight:200;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.btns{display:flex;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;font-weight:500;white-space:nowrap}
+.art{position:absolute;inset:-8%;filter:blur(calc(var(--b)*1cqw))}
+.device{--b:5}
+.s-running{--b:2.4}
+.s-finished{--b:0}
+
+.art{background:radial-gradient(circle at 70% 26%,#ffd3dd 0 13%,transparent 14%),radial-gradient(ellipse at 15% 114%,#6d78b8 0 50%,transparent 51%),radial-gradient(ellipse at 90% 118%,#8fb4d9 0 46%,transparent 47%),linear-gradient(180deg,#cfc6f0,#f6e3ee)}
+.bar{position:absolute;left:50%;transform:translateX(-50%);bottom:4cqw;background:rgba(255,255,255,.93);box-shadow:0 1cqw 4cqw rgba(35,35,75,.28);color:#2a2d3a}
+.row2{display:flex;align-items:center;justify-content:space-between}
+.btn{background:#eceaf7;color:#3c4377}
+.btn.primary{background:#6f7fb5;color:#fff}
+.title{font-weight:600}
+.meta{opacity:.8}
+.link{display:inline-block;font-weight:500;color:#4b57a3;text-decoration:underline}
+.laptop .bar{width:48cqw;border-radius:999px;padding:1.3cqw 1.6cqw 1.3cqw 4cqw}
+.laptop .time{font-size:5.6cqw;font-weight:300}
+.laptop .btns{gap:1cqw}
+.laptop .btn{font-size:1.8cqw;padding:1cqw 2.4cqw}
+.laptop .bar.open{width:58cqw;border-radius:3cqw;padding:3cqw 3.2cqw 2.4cqw;gap:3.2cqw}
+.laptop .bar.open .time{font-size:5cqw}
+.laptop .title{font-size:2.5cqw}
+.laptop .meta{font-size:1.9cqw;margin-top:.5cqw}
+.laptop .link{font-size:1.8cqw;margin-top:1.2cqw}
+.phone .bar{width:calc(100% - 8cqw);border-radius:999px;padding:2.4cqw 2.6cqw 2.4cqw 6cqw}
+.phone .time{font-size:10.5cqw;font-weight:300}
+.phone .btns{gap:1.4cqw;flex-wrap:nowrap}
+.phone .btn{font-size:3.7cqw;padding:2cqw 3.2cqw}
+.phone .bar.open{border-radius:7cqw;padding:5cqw 4.5cqw 4cqw;gap:4cqw}
+.phone .bar.open .time{font-size:11cqw}
+.phone .title{font-size:5.2cqw}
+.phone .meta{font-size:4.3cqw;margin-top:.8cqw}
+.phone .link{font-size:3.9cqw;margin-top:2cqw}
+</style></head><body>
+<header><h1>Floating Pill</h1><p class="sub">A clear painting with a small round bar that floats at the bottom. Design mockup only: nothing works yet, and the painting is a coloured shape for now.</p></header>
+<h2>On a laptop</h2><div class="row">
+<figure class="laptop-fig"><div class="device laptop s-before"><div class="art"></div><div class="bar"><div class="row2"><div class="time">25:00</div><div class="btns"><button type="button" class="btn primary">Start</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>1 · Before starting</figcaption></figure>
+<figure class="laptop-fig"><div class="device laptop s-running"><div class="art"></div><div class="bar"><div class="row2"><div class="time">14:32</div><div class="btns"><button type="button" class="btn primary">Pause</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>2 · Timer running</figcaption></figure>
+<figure class="laptop-fig"><div class="device laptop s-finished"><div class="art"></div><div class="bar open"><div class="info"><div class="title">Young Woman with a Water Pitcher</div><div class="meta">Johannes Vermeer · ca. 1662</div><a class="link" href="#">Read about this painting →</a></div><div class="row2"><div class="time">00:00</div><div class="btns"><button type="button" class="btn primary">Restart session</button></div></div></div></div><figcaption>3 · Timer finished</figcaption></figure>
+</div>
+<h2>On a phone</h2><div class="row">
+<figure class="phone-fig"><div class="device phone s-before"><div class="art"></div><div class="bar"><div class="row2"><div class="time">25:00</div><div class="btns"><button type="button" class="btn primary">Start</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>1 · Before starting</figcaption></figure>
+<figure class="phone-fig"><div class="device phone s-running"><div class="art"></div><div class="bar"><div class="row2"><div class="time">14:32</div><div class="btns"><button type="button" class="btn primary">Pause</button><button type="button" class="btn">Reset</button></div></div></div></div><figcaption>2 · Timer running</figcaption></figure>
+<figure class="phone-fig"><div class="device phone s-finished"><div class="art"></div><div class="bar open"><div class="info"><div class="title">Young Woman with a Water Pitcher</div><div class="meta">Johannes Vermeer · ca. 1662</div><a class="link" href="#">Read about this painting →</a></div><div class="row2"><div class="time">00:00</div><div class="btns"><button type="button" class="btn primary">Restart session</button></div></div></div></div><figcaption>3 · Timer finished</figcaption></figure>
+</div>
+</body></html>
