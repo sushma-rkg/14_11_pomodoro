@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bell sound samples</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #eef3f1;
+      color: #25363d;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+    h1 { font-size: 1.6rem; font-weight: 600; margin: 0 0 8px; text-align: center; }
+    p.note { margin: 0 0 28px; color: #5b6b72; text-align: center; max-width: 420px; line-height: 1.5; }
+    .list { display: flex; flex-direction: column; gap: 14px; width: min(100%, 420px); }
+    button {
+      font: inherit;
+      border: 0;
+      border-radius: 999px;
+      background: #3f6f78;
+      color: #fff;
+      padding: 16px 28px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    button small { display: block; font-weight: 400; opacity: .85; font-size: .85rem; margin-top: 2px; }
+    button:active { background: #2f5860; }
+  </style>
+</head>
+<body>
+  <h1>Bell sound samples</h1>
+  <p class="note">Press a button to hear that sound. Turn your volume up a little first.</p>
+  <div class="list">
+    <button type="button" data-sound="chime">Soft chime<small>gentle, high "ting"</small></button>
+    <button type="button" data-sound="warm">Warm bell<small>deep, round "bong"</small></button>
+    <button type="button" data-sound="triple">Triple ding<small>three quick, bright dings</small></button>
+  </div>
+
+  <script>
+    let ctx = null;
+
+    // One note of a bell: several pure tones that fade out together.
+    function note(start, freq, partials, decay) {
+      partials.forEach(([ratio, level]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq * ratio;
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(level, start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + decay);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + decay + 0.05);
+      });
+    }
+
+    const sounds = {
+      // Soft chime: high, gentle, fades slowly (about 2.5 seconds)
+      chime() {
+        const t = ctx.currentTime;
+        note(t, 1318.5, [[1, 0.3], [2.76, 0.1], [5.4, 0.04]], 2.5);
+      },
+      // Warm bell: low and round, long smooth fade (about 3 seconds)
+      warm() {
+        const t = ctx.currentTime;
+        note(t, 392, [[1, 0.4], [2.01, 0.2], [2.76, 0.12], [4.07, 0.06]], 3);
+      },
+      // Triple ding: three quick bright dings (about 2.2 seconds in total)
+      triple() {
+        const t = ctx.currentTime;
+        [0, 0.6, 1.2].forEach((delay) => {
+          note(t + delay, 1568, [[1, 0.28], [2.4, 0.08]], 1);
+        });
+      }
+    };
+
+    document.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === "suspended") ctx.resume();
+        sounds[button.dataset.sound]();
+      });
+    });
+  </script>
+</body>
+</html>
