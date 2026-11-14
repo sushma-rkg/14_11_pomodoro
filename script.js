@@ -1,4 +1,4 @@
-const TOTAL_MS = 25 * 60 * 1000;
+const TOTAL_MS = 30 * 1000; // TEMPORARY for testing: set back to 25 * 60 * 1000
 const MAX_BLUR = 5; // same blur as the "Before starting" design
 
 const timeEl = document.getElementById("time");
