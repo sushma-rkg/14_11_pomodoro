@@ -2,6 +2,8 @@ const TOTAL_MS = 30 * 1000; // TEMPORARY for testing: set back to 25 * 60 * 1000
 
 const timeEl = document.getElementById("time");
 const paintingEl = document.getElementById("painting");
+const frameEl = document.getElementById("frame");
+const blurEl = document.getElementById("blur-layer");
 const titleEl = document.getElementById("painting-title");
 const metaEl = document.getElementById("painting-meta");
 const linkEl = document.getElementById("painting-link");
@@ -91,6 +93,8 @@ const MET = "https://collectionapi.metmuseum.org/public/collection";
 const SEARCH = MET + "/v1.1/search?q=*&hasImages=true&medium=Paintings";
 const OBJECT = MET + "/v1/objects/";
 let painting = null; // everything we show comes from this one record
+let maxBlur = 0; // the strongest blur (in pixels) for the painting on screen
+let blurJump = false; // true = change the blur at once instead of gliding
 let loadCount = 0;
 
 async function getJson(url) {
@@ -122,17 +126,70 @@ async function pickPainting() {
   return null;
 }
 
+// The blurred copy of the painting. The picture is mirrored around its own
+// edges before it is blurred, so the edges stay crisp and the blur never
+// spills outside the painting area. It uses the picture that is already
+// loaded, so it asks the Met for nothing extra.
+function drawBlurLayer() {
+  const width = frameEl.clientWidth;
+  const height = frameEl.clientHeight;
+  if (!width || !height || !paintingEl.naturalWidth) return;
+  maxBlur = 0.06 * Math.min(width, height);
+  const pad = Math.ceil(maxBlur * 3);
+  const scale = window.devicePixelRatio || 1;
+  blurEl.width = Math.round((width + 2 * pad) * scale);
+  blurEl.height = Math.round((height + 2 * pad) * scale);
+  blurEl.style.width = width + 2 * pad + "px";
+  blurEl.style.height = height + 2 * pad + "px";
+  blurEl.style.left = -pad + "px";
+  blurEl.style.top = -pad + "px";
+  const ctx = blurEl.getContext("2d");
+  ctx.scale(scale, scale);
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      ctx.save();
+      ctx.translate(
+        i === 0 ? pad : pad + (i + 1) * width,
+        j === 0 ? pad : pad + (j + 1) * height
+      );
+      ctx.scale(i === 0 ? 1 : -1, j === 0 ? 1 : -1);
+      ctx.drawImage(paintingEl, 0, 0, width, height);
+      ctx.restore();
+    }
+  }
+  applyBlur(true);
+}
+
+// The blur depends on how much of the set time is left: strongest at the
+// start, none at 00:00.
+function applyBlur(jump) {
+  const blur = maxBlur * (remainingMs / TOTAL_MS);
+  const on = blur > 0.05;
+  blurEl.style.transition = jump ? "none" : "filter 0.3s linear";
+  blurEl.style.filter = on ? "blur(" + blur + "px)" : "none";
+  blurEl.style.visibility = on ? "visible" : "hidden";
+}
+
+new ResizeObserver(drawBlurLayer).observe(frameEl);
+
 async function loadPainting() {
   const thisLoad = ++loadCount;
   painting = null;
-  paintingEl.classList.remove("ready");
+  frameEl.classList.remove("ready");
   paintingEl.removeAttribute("src");
+  blurJump = true;
   show();
   const chosen = await pickPainting();
   if (thisLoad !== loadCount || !chosen) return; // a newer painting was asked for
   painting = chosen;
   paintingEl.onload = () => {
-    if (thisLoad === loadCount) paintingEl.classList.add("ready");
+    if (thisLoad !== loadCount) return;
+    frameEl.style.setProperty(
+      "--ratio",
+      paintingEl.naturalWidth / paintingEl.naturalHeight
+    );
+    drawBlurLayer(); // blurred first, then shown: it never appears sharp
+    frameEl.classList.add("ready");
   };
   paintingEl.src = chosen.image;
   show();
@@ -166,6 +223,8 @@ function show() {
   showDetails(finished);
   mainButton.textContent =
     state === "running" ? "Pause" : state === "paused" ? "Resume" : "Start";
+  applyBlur(blurJump);
+  blurJump = false;
 }
 
 // Works out the time left from the real clock, so it stays correct
@@ -206,6 +265,7 @@ function reset() {
   stopBell();
   state = "idle";
   remainingMs = TOTAL_MS;
+  blurJump = true;
   show();
 }
 
