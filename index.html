@@ -3,11 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pomodoro Art</title>
+  <title>Pomodoro Timer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Pomodoro Art</h1>
+  <div class="art" aria-hidden="true"></div>
+  <main class="panel">
+    <p class="time">25:00</p>
+    <div class="buttons">
+      <button type="button" class="btn primary">Start</button>
+      <button type="button" class="btn">Reset</button>
+    </div>
+  </main>
   <script src="script.js"></script>
 </body>
 </html>
