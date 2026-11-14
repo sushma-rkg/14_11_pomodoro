@@ -26,7 +26,7 @@ body {
 .art {
   position: absolute;
   inset: -8%;
-  filter: blur(calc(var(--u) * 5));
+  filter: blur(calc(var(--u) * var(--blur, 5)));
   background:
     radial-gradient(circle at 70% 28%, #ffe6bd 0 13%, transparent 14%),
     radial-gradient(ellipse at 15% 112%, #7fa392 0 48%, transparent 49%),
@@ -82,6 +82,7 @@ body {
 .btn.primary {
   background: #3f6f78;
   color: #fff;
+  min-width: 6.2em;
 }
 
 /* Phone (tall screens): bigger, rounder panel */
